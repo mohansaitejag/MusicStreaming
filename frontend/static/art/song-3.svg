@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Album art 3">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#6c63ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" rx="44" fill="url(#g)"/>
+  <path d="M0 296c68-42 120-63 156-63 44 0 80 18 110 54 22 26 48 43 74 51v62H0z" fill="rgba(255,255,255,0.18)"/>
+  <circle cx="272" cy="124" r="78" fill="rgba(255,255,255,0.16)"/>
+  <circle cx="128" cy="152" r="46" fill="rgba(255,255,255,0.24)"/>
+  <text x="34" y="346" fill="white" font-family="Arial, sans-serif" font-size="44" font-weight="700" opacity="0.9">Pulse</text>
+</svg>

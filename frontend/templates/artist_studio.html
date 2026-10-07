@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Artist Studio | PulseBeat{% endblock %}
+
+{% block content %}
+<script>
+  window.APP_CONFIG = window.APP_CONFIG || {};
+  window.APP_CONFIG.editSong = {{ edit_song|tojson if edit_song else 'null' }};
+</script>
+
+<div class="mb-10">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <p class="text-sm font-semibold text-accent uppercase tracking-wider mb-2">Artist Studio</p>
+      <h2 class="text-4xl font-bold text-primary tracking-tight">Dashboard</h2>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+    <!-- Stats Cards -->
+    <div class="bg-surface border border-border rounded-2xl p-6 hover:border-surface-active transition-colors">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-8 h-8 rounded-lg bg-surface-active flex items-center justify-center text-accent">
+          <i class="ri-group-line"></i>
+        </div>
+        <h3 class="font-medium text-secondary">Followers</h3>
+      </div>
+      <div class="text-3xl font-bold text-primary">{{ payload.artist.num_followers|default(0) }}</div>
+    </div>
+    
+    <div class="bg-surface border border-border rounded-2xl p-6 hover:border-surface-active transition-colors">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-8 h-8 rounded-lg bg-surface-active flex items-center justify-center text-accent">
+          <i class="ri-music-2-line"></i>
+        </div>
+        <h3 class="font-medium text-secondary">Total Songs</h3>
+      </div>
+      <div class="text-3xl font-bold text-primary">{{ payload.songs|length }}</div>
+    </div>
+
+    <div class="bg-surface border border-border rounded-2xl p-6 hover:border-surface-active transition-colors">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-8 h-8 rounded-lg bg-surface-active flex items-center justify-center text-accent">
+          <i class="ri-money-dollar-circle-line"></i>
+        </div>
+        <h3 class="font-medium text-secondary">Total Earnings</h3>
+      </div>
+      <div class="text-3xl font-bold text-primary">${{ '%.2f'|format(payload.summary.total_earned|default(0)) }}</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+    <!-- Release/Edit Form -->
+    <div class="xl:col-span-1">
+      <div class="bg-surface border border-border rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-xl font-bold">{% if edit_song %}Edit Song{% else %}Release New Song{% endif %}</h3>
+          {% if edit_song %}
+          <a href="{{ url_for('artist_studio_view') }}" class="text-xs text-secondary hover:text-primary transition-colors flex items-center gap-1">
+            <i class="ri-close-line"></i> Cancel
+          </a>
+          {% endif %}
+        </div>
+
+        {% if edit_song %}
+        <!-- Edit mode hint banner -->
+        <div class="mb-5 p-3 rounded-lg bg-accent/10 border border-accent/30 text-sm text-accent flex items-start gap-2">
+          <i class="ri-information-line mt-0.5 shrink-0"></i>
+          <div>
+            <p class="font-semibold mb-0.5">Editing: "{{ edit_song.song_title }}"</p>
+            <p class="text-xs text-secondary">Update the fields below and click <strong>Update Song</strong> to save your changes.</p>
+          </div>
+        </div>
+        {% endif %}
+
+        <form id="release-song-form" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-secondary mb-1">Song Title</label>
+            <input type="text" id="release-song-title" value="{{ edit_song.song_title if edit_song else '' }}" class="w-full bg-black border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:border-accent text-primary placeholder-muted" placeholder="e.g., Midnight Vibes">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-secondary mb-1">Duration (seconds)</label>
+            <input type="number" id="release-song-duration" min="1" value="{{ edit_song.duration if edit_song else '' }}" class="w-full bg-black border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:border-accent text-primary placeholder-muted" placeholder="e.g., 210">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-secondary mb-1">Collaborators (Optional)</label>
+            <select id="release-collaborators" multiple class="w-full bg-black border border-border rounded-lg px-4 py-2 focus:outline-none focus:border-accent text-primary min-h-[100px]">
+              {% for c in payload.collaborators %}
+                <option value="{{ c.artist_id }}" {% if edit_song and edit_song.collaborator_ids and c.artist_id in edit_song.collaborator_ids %}selected{% endif %}>{{ c.artist_name }}</option>
+              {% endfor %}
+            </select>
+            <p class="text-xs text-muted mt-1">Hold Ctrl/Cmd to select multiple</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-secondary mb-1">Genres</label>
+            <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto bg-black p-3 rounded-lg border border-border" id="release-genres">
+               {% for g in payload.genres %}
+                 <label class="flex items-center gap-2 text-sm text-secondary hover:text-primary cursor-pointer">
+                   <input type="checkbox" value="{{ g.genre_id }}" class="rounded bg-surface border-border text-accent focus:ring-accent" {% if edit_song and edit_song.genre_ids and g.genre_id in edit_song.genre_ids %}checked{% endif %}>
+                   <span>{{ g.genre_name }}</span>
+                 </label>
+               {% endfor %}
+            </div>
+          </div>
+          <button type="submit" class="w-full py-3 rounded-xl bg-accent hover:bg-accent-hover text-white font-bold transition-all shadow-lg shadow-accent/20 mt-6">
+            {% if edit_song %}<i class="ri-save-line mr-2"></i>Update Song{% else %}<i class="ri-upload-cloud-line mr-2"></i>Release Song{% endif %}
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Released Songs -->
+    <div class="xl:col-span-2">
+      <div class="bg-surface border border-border rounded-2xl p-6">
+        <h3 class="text-xl font-bold mb-6">Your Catalog</h3>
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center p-3 text-secondary text-sm font-medium border-b border-border/50 mb-2">
+             <div class="flex-1">Title</div>
+             <div class="w-20 text-right">Plays</div>
+             <div class="w-20 text-right">Likes</div>
+             <div class="w-20 text-right">Sales</div>
+             <div class="w-28 text-center">Actions</div>
+          </div>
+          
+          {% for s in payload.songs %}
+          <div class="flex items-center p-3 rounded-lg hover:bg-surface-hover transition-colors group {% if edit_song and edit_song.song_id == s.song_id %}ring-1 ring-accent/40 bg-accent/5{% endif %}">
+            <div class="flex items-center gap-4 flex-1 min-w-0 song-clickable cursor-pointer" data-song='{{ s|tojson }}'>
+              <div class="w-10 h-10 rounded bg-surface-active shrink-0 bg-cover-center row-cover"></div>
+              <div class="min-w-0">
+                <div class="font-medium text-primary truncate group-hover:text-accent transition-colors">{{ s.song_title }}</div>
+                <div class="text-xs text-secondary truncate">{{ s.release_date or 'Unknown' }}</div>
+              </div>
+            </div>
+            <div class="w-20 text-right text-secondary text-sm">{{ s.num_plays|default(0) }}</div>
+            <div class="w-20 text-right text-secondary text-sm">{{ s.num_likes|default(0) }}</div>
+            <div class="w-20 text-right text-secondary text-sm">{{ s.num_sales|default(0) }}</div>
+            <div class="w-28 flex justify-center gap-1">
+               <a href="{{ url_for('artist_studio_view', edit_song_id=s.song_id) }}" class="p-2 {% if edit_song and edit_song.song_id == s.song_id %}text-accent{% else %}text-secondary hover:text-primary{% endif %} transition-colors" title="Edit">
+                 <i class="ri-edit-line text-lg"></i>
+               </a>
+               <button class="delete-song-btn p-2 text-secondary hover:text-red-400 transition-colors" data-song-id="{{ s.song_id }}" data-song-title="{{ s.song_title }}" title="Delete">
+                 <i class="ri-delete-bin-line text-lg"></i>
+               </button>
+            </div>
+          </div>
+          {% else %}
+          <div class="py-12 text-center text-muted border border-border border-dashed rounded-lg">You haven't released any songs yet.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

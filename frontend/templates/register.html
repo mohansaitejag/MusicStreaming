@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register | PulseBeat</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            black: 'var(--color-black)',
+            surface: 'var(--color-surface)',
+            'surface-hover': 'var(--color-surface-hover)',
+            'surface-active': 'var(--color-surface-active)',
+            border: 'var(--color-border)',
+            accent: 'var(--color-accent)',
+            'accent-hover': 'var(--color-accent-hover)',
+            'accent-muted': 'var(--color-accent-muted)',
+            primary: 'var(--color-text-primary)',
+            secondary: 'var(--color-text-secondary)',
+            muted: 'var(--color-text-muted)'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body class="min-h-screen w-screen bg-black text-primary flex items-center justify-center relative overflow-x-hidden py-12 font-sans">
+  
+  <!-- Background Decoration -->
+  <div class="absolute inset-0 z-0">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/20 rounded-full blur-[128px]"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[128px]"></div>
+  </div>
+
+  <div class="relative z-10 w-full max-w-md p-6">
+    <div class="flex flex-col items-center mb-8">
+      <div class="w-16 h-16 mb-4 drop-shadow-[0_0_20px_rgba(139,92,246,0.6)]">
+        <img src="{{ url_for('static', filename='art/logo.svg') }}" class="w-full h-full" alt="PulseBeat Logo">
+      </div>
+      <h1 class="text-3xl font-bold text-center tracking-tight">Create your account</h1>
+      <p class="text-secondary mt-2 text-center">Join the PulseBeat music community.</p>
+    </div>
+
+    {% if error %}
+    <div class="bg-red-500/10 border border-red-500/50 text-red-500 p-4 rounded-xl mb-6 flex items-center gap-3">
+       <i class="ri-error-warning-line text-xl"></i>
+       <span class="text-sm font-medium">{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <div class="bg-surface border border-border p-8 rounded-3xl shadow-2xl">
+      <form method="POST" action="{{ url_for('register') }}" class="space-y-5">
+        
+        <div>
+          <label class="block text-sm font-medium text-secondary mb-2">Your Name</label>
+          <div class="relative">
+             <i class="ri-user-line absolute left-4 top-1/2 -translate-y-1/2 text-muted text-lg"></i>
+             <input type="text" name="name" required placeholder="John Doe" class="w-full bg-black border border-border rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-primary placeholder-muted transition-all">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-secondary mb-2">Email Address</label>
+          <div class="relative">
+             <i class="ri-mail-line absolute left-4 top-1/2 -translate-y-1/2 text-muted text-lg"></i>
+             <input type="email" name="email" required placeholder="john@example.com" class="w-full bg-black border border-border rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-primary placeholder-muted transition-all">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-secondary mb-2">Password</label>
+          <div class="relative">
+             <i class="ri-lock-line absolute left-4 top-1/2 -translate-y-1/2 text-muted text-lg"></i>
+             <input type="password" name="password" required placeholder="Create password" class="w-full bg-black border border-border rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-primary placeholder-muted transition-all">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-secondary mb-2">Account Role</label>
+          <div class="relative">
+             <i class="ri-user-settings-line absolute left-4 top-1/2 -translate-y-1/2 text-muted text-lg"></i>
+             <select id="role" name="role" required class="w-full bg-black border border-border rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-primary transition-all appearance-none cursor-pointer">
+                <option value="user" selected>Listener (User)</option>
+                <option value="artist">Artist</option>
+             </select>
+             <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-secondary pointer-events-none"></i>
+          </div>
+        </div>
+
+        <div id="nationality-container" style="display: none;">
+          <label class="block text-sm font-medium text-secondary mb-2">Nationality</label>
+          <div class="relative">
+             <i class="ri-global-line absolute left-4 top-1/2 -translate-y-1/2 text-muted text-lg"></i>
+             <input type="text" id="nationality" name="nationality" placeholder="e.g., India, USA" class="w-full bg-black border border-border rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-primary placeholder-muted transition-all">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-hover text-white font-bold transition-all shadow-lg shadow-accent/25 mt-2">
+          Sign Up
+        </button>
+      </form>
+    </div>
+    
+    <div class="mt-8 text-center text-sm text-secondary">
+      <p>Already have an account? <a href="{{ url_for('login') }}" class="text-accent hover:underline font-medium">Log In</a></p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('role').addEventListener('change', function() {
+      const nationalityContainer = document.getElementById('nationality-container');
+      const nationalityInput = document.getElementById('nationality');
+      if (this.value === 'artist') {
+        nationalityContainer.style.display = 'block';
+        nationalityInput.required = true;
+      } else {
+        nationalityContainer.style.display = 'none';
+        nationalityInput.required = false;
+        nationalityInput.value = '';
+      }
+    });
+  </script>
+
+</body>
+</html>

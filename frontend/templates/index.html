@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}Home | PulseBeat{% endblock %}
+
+{% block content %}
+<div class="mb-10">
+  <p class="text-sm font-semibold text-accent uppercase tracking-wider mb-2">Good afternoon</p>
+  <h2 class="text-4xl font-bold text-primary tracking-tight">
+    {% if profile.user_role == 'artist' %}
+    Your hosting space.
+    {% else %}
+    Your listening space.
+    {% endif %}
+  </h2>
+</div>
+
+{% if profile.user_role == 'artist' %}
+<!-- Artist Home View -->
+<section class="mb-12" id="recent">
+  <div class="flex items-end justify-between mb-6">
+    <div>
+      <p class="text-xs font-semibold text-muted tracking-wider uppercase mb-1">Your releases</p>
+      <h3 class="text-2xl font-bold">Recent releases</h3>
+    </div>
+    <a class="text-sm font-medium text-secondary hover:text-primary transition-colors" href="{{ url_for('artist_studio_view') }}">See all</a>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+    {% for s in data.recent_releases %}
+    <article class="group song-clickable cursor-pointer bg-surface hover:bg-surface-hover rounded-xl p-4 transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/50" data-song='{{ s|tojson }}'>
+      <div class="aspect-square rounded-lg bg-surface-active mb-4 relative overflow-hidden bg-cover-center recent-cover">
+        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <button class="w-12 h-12 rounded-full bg-accent text-white flex items-center justify-center shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-all">
+            <i class="ri-play-fill text-2xl ml-1"></i>
+          </button>
+        </div>
+      </div>
+      <div class="font-semibold text-primary truncate text-base mb-1">{{ s.song_title }}</div>
+      <div class="text-xs text-secondary truncate">{{ s.num_plays }} plays</div>
+    </article>
+    {% else %}
+    <div class="col-span-full py-8 text-center text-muted bg-surface rounded-xl border border-border border-dashed">No recent releases</div>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+  <section id="top">
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <p class="text-xs font-semibold text-muted tracking-wider uppercase mb-1">Your top releases</p>
+        <h3 class="text-2xl font-bold">By views</h3>
+      </div>
+      <a class="text-sm font-medium text-secondary hover:text-primary transition-colors" href="{{ url_for('artist_studio_view') }}">See all</a>
+    </div>
+    <div class="flex flex-col gap-2">
+      {% for s in data.top_releases %}
+      <article class="flex items-center justify-between p-3 rounded-lg hover:bg-surface-hover transition-colors group cursor-pointer song-clickable" data-song='{{ s|tojson }}'>
+        <div class="flex items-center gap-4 min-w-0">
+          <div class="w-12 h-12 rounded bg-surface-active shrink-0 relative overflow-hidden bg-cover-center row-cover">
+             <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <i class="ri-play-fill text-white"></i>
+             </div>
+          </div>
+          <div class="min-w-0">
+            <div class="font-medium text-primary truncate">{{ s.song_title }}</div>
+            <div class="text-xs text-secondary truncate">{{ s.num_plays }} plays</div>
+          </div>
+        </div>
+      </article>
+      {% else %}
+      <div class="py-6 text-center text-muted border border-border border-dashed rounded-lg">No releases found</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section id="artists">
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <p class="text-xs font-semibold text-muted tracking-wider uppercase mb-1">Your collaborators</p>
+        <h3 class="text-2xl font-bold">Top collaborators</h3>
+      </div>
+      <a class="text-sm font-medium text-secondary hover:text-primary transition-colors" href="{{ url_for('artist_studio_view') }}">See all</a>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {% for c in data.top_collaborators %}
+      <a class="bg-surface hover:bg-surface-hover rounded-xl p-4 transition-all text-center group block tile-card" data-artist-id="{{ c.artist_id }}" href="{{ url_for('artist_view', artist_id=c.artist_id) }}">
+        <div class="w-24 h-24 mx-auto rounded-full bg-surface-active mb-4 overflow-hidden tile-cover bg-cover-center shadow-lg group-hover:shadow-xl transition-shadow"></div>
+        <div class="font-semibold text-primary truncate">{{ c.artist_name }}</div>
+        <div class="text-xs text-secondary truncate mt-1">{% if c.collaboration_count %}{{ c.collaboration_count }} collaborations{% else %}Collaborator{% endif %}</div>
+      </a>
+      {% else %}
+      <div class="col-span-full py-6 text-center text-muted border border-border border-dashed rounded-lg">No collaborators yet</div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+
+{% else %}
+<!-- Regular User Home View -->
+<section class="mb-12" id="recent">
+  <div class="flex items-end justify-between mb-6">
+    <div>
+      <p class="text-xs font-semibold text-muted tracking-wider uppercase mb-1">Recently played</p>
+      <h3 class="text-2xl font-bold">Continue listening</h3>
+    </div>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6" id="recent-list">
+    {% for s in data.recent_songs %}
+    <article class="group song-clickable cursor-pointer bg-surface hover:bg-surface-hover rounded-xl p-4 transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/50" data-song='{{ s|tojson }}'>
+      <div class="aspect-square rounded-lg bg-surface-active mb-4 relative overflow-hidden bg-cover-center recent-cover">
+        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <button class="w-12 h-12 rounded-full bg-accent text-white flex items-center justify-center shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-all">
+            <i class="ri-play-fill text-2xl ml-1"></i>
+          </button>
+        </div>
+      </div>
+      <div class="font-semibold text-primary truncate text-base mb-1">{{ s.song_title }}</div>
+      <div class="text-xs text-secondary truncate">{{ s.artists }}</div>
+    </article>
+    {% else %}
+    <div class="col-span-full py-8 text-center text-muted bg-surface rounded-xl border border-border border-dashed">No recent activity</div>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+  <section id="top">
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <p class="text-xs font-semibold text-muted tracking-wider uppercase mb-1">Trending now</p>
+        <h3 class="text-2xl font-bold">Popular picks</h3>
+      </div>
+    </div>
+    <div class="flex flex-col gap-2">
+      {% for s in data.trending_songs %}
+      <article class="flex items-center justify-between p-3 rounded-lg hover:bg-surface-hover transition-colors group cursor-pointer song-clickable" data-song='{{ s|tojson }}'>
+        <div class="flex items-center gap-4 min-w-0">
+          <div class="w-12 h-12 rounded bg-surface-active shrink-0 relative overflow-hidden bg-cover-center row-cover">
+             <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <i class="ri-play-fill text-white"></i>
+             </div>
+          </div>
+          <div class="min-w-0">
+            <div class="font-medium text-primary truncate">{{ s.song_title }}</div>
+            <div class="text-xs text-secondary truncate">{{ s.artists }}</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity tile-actions relative z-10">
+           <button class="text-secondary hover:text-accent like-btn" title="Like"><i class="ri-heart-line text-lg"></i></button>
+           <button class="text-secondary hover:text-primary add-playlist-btn" title="Add to Playlist"><i class="ri-play-list-add-line text-lg"></i></button>
+        </div>
+      </article>
+      {% else %}
+      <div class="py-6 text-center text-muted border border-border border-dashed rounded-lg">No songs found</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section id="artists">
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <p class="text-xs font-semibold text-muted tracking-wider uppercase mb-1">Top artists for you</p>
+        <h3 class="text-2xl font-bold">Artists you may love</h3>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {% for a in data.all_artists %}
+      <a class="bg-surface hover:bg-surface-hover rounded-xl p-4 transition-all text-center group block tile-card" data-artist-id="{{ a.artist_id }}" href="{{ url_for('artist_view', artist_id=a.artist_id) }}">
+        <div class="w-24 h-24 mx-auto rounded-full bg-surface-active mb-4 overflow-hidden tile-cover bg-cover-center shadow-lg group-hover:shadow-xl transition-shadow"></div>
+        <div class="font-semibold text-primary truncate">{{ a.artist_name }}</div>
+        <div class="text-xs text-secondary truncate mt-1">{{ a.num_followers }} followers</div>
+      </a>
+      {% else %}
+      <div class="col-span-full py-6 text-center text-muted border border-border border-dashed rounded-lg">No artists available</div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endif %}
+
+{% endblock %}

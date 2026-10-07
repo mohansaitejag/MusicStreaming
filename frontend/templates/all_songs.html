@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{% if profile.user_role == 'artist' %}My Songs{% else %}All Songs{% endif %} | PulseBeat{% endblock %}
+
+{% block content %}
+<div class="mb-10 flex items-center justify-between">
+  <div>
+    <p class="text-sm font-semibold text-accent uppercase tracking-wider mb-2">{% if profile.user_role == 'artist' %}Artist{% else %}Explore{% endif %}</p>
+    <h2 class="text-4xl font-bold text-primary tracking-tight">{% if profile.user_role == 'artist' %}My Songs{% else %}All Songs{% endif %}</h2>
+  </div>
+  {% if songs %}
+  <button
+    class="play-btn flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent-hover rounded-full text-white font-medium shadow-lg hover:shadow-accent/30 transition-all transform hover:scale-105"
+    data-song='{{ songs[0]|tojson }}'>
+    <i class="ri-play-fill text-2xl"></i>
+    <span>Play All</span>
+  </button>
+  {% endif %}
+</div>
+
+<section class="mb-12">
+  <div class="flex flex-col gap-2">
+    <!-- Header -->
+    <div class="flex items-center p-3 text-secondary text-sm font-medium border-b border-border/50 mb-2">
+      <div class="w-12 text-center">#</div>
+      <div class="flex-1">Title</div>
+      <div class="w-32 text-right pr-12">Plays</div>
+    </div>
+
+    {% for s in songs %}
+    <article
+      class="flex items-center p-3 rounded-lg hover:bg-surface-hover transition-colors group cursor-pointer song-clickable"
+      data-song='{{ s|tojson }}'>
+      <div class="w-12 text-center text-secondary group-hover:hidden">{{ loop.index }}</div>
+      <div class="w-12 text-center hidden group-hover:block text-primary">
+        <i class="ri-play-fill text-xl"></i>
+      </div>
+      <div class="flex items-center gap-4 flex-1 min-w-0">
+        <div class="w-10 h-10 rounded bg-surface-active shrink-0 bg-cover-center row-cover"></div>
+        <div class="min-w-0">
+          <div class="font-medium text-primary truncate">{{ s.song_title }}</div>
+          <div class="text-xs text-secondary truncate">{{ s.artists }}</div>
+        </div>
+      </div>
+      <div class="w-32 text-right flex items-center justify-end gap-4">
+        <div class="text-secondary text-sm group-hover:hidden">{{ s.num_plays|default(0) }}</div>
+        <div class="hidden group-hover:flex items-center gap-3">
+          <button class="like-btn text-secondary hover:text-accent"><i class="ri-heart-line text-lg"></i></button>
+          <button class="add-playlist-btn text-secondary hover:text-primary"><i
+              class="ri-play-list-add-line text-lg"></i></button>
+        </div>
+      </div>
+    </article>
+    {% else %}
+    <div class="py-12 text-center text-muted border border-border border-dashed rounded-lg">No tracks found.</div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Album art 1">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6c63ff"/>
+      <stop offset="100%" stop-color="#00d4c8"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" rx="44" fill="url(#g)"/>
+  <circle cx="118" cy="108" r="82" fill="rgba(255,255,255,0.18)"/>
+  <circle cx="286" cy="288" r="110" fill="rgba(255,255,255,0.10)"/>
+  <path d="M70 270c42-68 94-100 141-100s91 28 119 84" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="14" stroke-linecap="round"/>
+  <path d="M90 312c36-42 72-62 108-62s71 17 112 54" fill="none" stroke="rgba(255,255,255,0.24)" stroke-width="10" stroke-linecap="round"/>
+  <text x="34" y="350" fill="white" font-family="Arial, sans-serif" font-size="48" font-weight="700" opacity="0.92">PB</text>
+</svg>

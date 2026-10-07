@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Profile | PulseBeat{% endblock %}
+
+{% block content %}
+<div class="mb-10">
+  <div class="flex items-center gap-6 mb-8">
+    <div class="w-24 h-24 rounded-full bg-accent text-white flex items-center justify-center text-4xl font-bold shadow-[0_0_30px_rgba(139,92,246,0.3)]">
+      {{ profile.name[:1] if profile.name else '?' }}
+    </div>
+    <div>
+      <p class="text-sm font-semibold text-accent uppercase tracking-wider mb-1">Profile</p>
+      <h1 class="text-5xl font-bold text-primary tracking-tighter">{{ profile.name }}</h1>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+  <div class="space-y-8">
+    <section class="bg-surface rounded-2xl p-6 border border-border">
+      <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+        <i class="ri-user-settings-line text-accent"></i> Account Info
+      </h2>
+      <div class="space-y-4">
+        <div class="flex justify-between items-center py-2 border-b border-border/50">
+          <span class="text-secondary text-sm">Name</span>
+          <span class="font-medium">{{ profile.name }}</span>
+        </div>
+        <div class="flex justify-between items-center py-2 border-b border-border/50">
+          <span class="text-secondary text-sm">Email</span>
+          <span class="font-medium">{{ profile.email_id }}</span>
+        </div>
+        <div class="flex justify-between items-center py-2 border-b border-border/50">
+          <span class="text-secondary text-sm">Role</span>
+          <span class="font-medium capitalize px-2 py-1 rounded bg-surface-active text-xs">{{ profile.user_role }}</span>
+        </div>
+        {% if profile.user_role != 'artist' %}
+        <div class="flex justify-between items-center py-2 border-b border-border/50">
+          <span class="text-secondary text-sm">Subscription</span>
+          <div class="text-right">
+            <span id="profile-sub-type" class="font-medium capitalize text-accent">{{ profile.subscription_type or 'Free' }}</span>
+            <div id="profile-sub-end-container" class="text-xs text-muted mt-1" {% if not profile.subscription_end %}style="display:none;"{% endif %}>Valid until <span id="profile-sub-end">{{ profile.subscription_end }}</span></div>
+          </div>
+        </div>
+        {% endif %}
+        
+        <div class="pt-4">
+          <a href="{{ url_for('logout') }}" hx-boost="false" class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 hover:border-red-500 transition-colors font-medium">
+            <i class="ri-logout-box-r-line"></i>
+            <span>Log Out</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-surface rounded-2xl p-6 border border-border">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold flex items-center gap-2">
+          <i class="ri-wallet-3-line text-accent"></i> Wallet
+        </h2>
+        <span class="text-2xl font-bold text-primary">${{ "%.2f"|format(profile.wallet_balance or 0.0) }}</span>
+      </div>
+      <div class="flex gap-3">
+        <button id="add-money-btn" class="flex-1 py-2.5 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium transition-colors shadow-lg shadow-accent/20">Add Money</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="space-y-8">
+    {% if profile.user_role != 'artist' %}
+    <section class="bg-surface rounded-2xl p-6 border border-border">
+      <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+        <i class="ri-vip-crown-line text-accent"></i> Premium Plans
+      </h2>
+      
+      <div id="active-sub-container" class="mb-6 p-4 rounded-xl bg-surface-active border border-border" {% if not profile.subscription_type or profile.subscription_type == 'free' %}style="display:none;"{% endif %}>
+        <p class="text-sm text-secondary mb-3">You are currently on the <strong id="active-sub-name" class="text-primary">{{ profile.subscription_type }}</strong> plan.</p>
+        <button id="cancel-sub-btn" class="w-full py-2.5 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 hover:border-red-500 transition-colors font-medium">Cancel Subscription</button>
+      </div>
+      
+      <div id="available-plans-container" class="space-y-4" {% if profile.subscription_type and profile.subscription_type != 'free' %}style="display:none;"{% endif %}>
+        <div class="p-5 rounded-xl border border-border hover:border-accent/50 transition-colors group">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <h3 class="font-bold text-lg">Monthly Premium</h3>
+              <p class="text-sm text-secondary">Billed monthly</p>
+            </div>
+            <span class="text-xl font-bold">$10.00</span>
+          </div>
+          <ul class="text-sm text-secondary space-y-2 mb-4">
+            <li class="flex items-center gap-2"><i class="ri-check-line text-accent"></i> Unlimited downloads</li>
+            <li class="flex items-center gap-2"><i class="ri-check-line text-accent"></i> Ad-free listening</li>
+          </ul>
+          <button class="purchase-btn w-full py-2 rounded-lg bg-surface-active hover:bg-accent hover:text-white transition-colors font-medium" data-type="premium" data-duration="1">Select Monthly</button>
+        </div>
+        
+        <div class="p-5 rounded-xl border border-accent bg-accent/5 relative overflow-hidden group">
+          <div class="absolute top-0 right-0 bg-accent text-black text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">Save 16%</div>
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <h3 class="font-bold text-lg">Annual Premium</h3>
+              <p class="text-sm text-secondary">Billed yearly</p>
+            </div>
+            <span class="text-xl font-bold">$100.00</span>
+          </div>
+          <ul class="text-sm text-secondary space-y-2 mb-4">
+            <li class="flex items-center gap-2"><i class="ri-check-line text-accent"></i> Unlimited downloads</li>
+            <li class="flex items-center gap-2"><i class="ri-check-line text-accent"></i> Ad-free listening</li>
+            <li class="flex items-center gap-2"><i class="ri-check-line text-accent"></i> 2 months free</li>
+          </ul>
+          <button class="purchase-btn w-full py-2 rounded-lg bg-accent hover:bg-accent-hover text-black transition-colors font-bold shadow-lg shadow-accent/20" data-type="premium" data-duration="12">Select Annual</button>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}PulseBeat{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            black: 'var(--color-black)',
+            surface: 'var(--color-surface)',
+            'surface-hover': 'var(--color-surface-hover)',
+            'surface-active': 'var(--color-surface-active)',
+            border: 'var(--color-border)',
+            accent: 'var(--color-accent)',
+            'accent-hover': 'var(--color-accent-hover)',
+            'accent-muted': 'var(--color-accent-muted)',
+            primary: 'var(--color-text-primary)',
+            secondary: 'var(--color-text-secondary)',
+            muted: 'var(--color-text-muted)'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body hx-boost="true" hx-select="#main-content" hx-target="#main-content" hx-swap="outerHTML show:window:top" class="h-screen w-screen bg-black text-primary flex overflow-hidden">
+  
+  <!-- Sidebar -->
+  <aside class="w-[280px] bg-black border-r border-border flex flex-col flex-shrink-0">
+    <!-- Logo -->
+    <div class="h-20 flex items-center px-6 shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 mb-1 drop-shadow-[0_0_15px_rgba(139,92,246,0.5)]">
+          <img src="{{ url_for('static', filename='art/logo.svg') }}" class="w-full h-full" alt="PulseBeat Logo">
+        </div>
+        <div>
+          <h1 class="text-xl font-bold leading-none tracking-tight">PulseBeat</h1>
+          <p class="text-xs text-muted mt-1">Premium curation</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-8">
+      <div>
+        <div class="text-xs font-semibold text-muted tracking-wider uppercase mb-4 px-2">Menu</div>
+        <div class="space-y-1">
+          <a href="{{ url_for('home') }}" class="flex items-center gap-4 px-3 py-2.5 rounded-lg text-secondary hover:text-primary hover:bg-surface-hover transition-colors group">
+            <i class="ri-home-5-line text-xl group-hover:text-accent transition-colors"></i>
+            <span class="font-medium">Home</span>
+          </a>
+          <a href="{{ url_for('all_songs_view') }}" class="flex items-center gap-4 px-3 py-2.5 rounded-lg text-secondary hover:text-primary hover:bg-surface-hover transition-colors group">
+            <i class="ri-music-2-line text-xl group-hover:text-accent transition-colors"></i>
+            <span class="font-medium">All Songs</span>
+          </a>
+          <a href="{{ url_for('genres_view') }}" class="flex items-center gap-4 px-3 py-2.5 rounded-lg text-secondary hover:text-primary hover:bg-surface-hover transition-colors group">
+            <i class="ri-compass-3-line text-xl group-hover:text-accent transition-colors"></i>
+            <span class="font-medium">Genre</span>
+          </a>
+          <a href="{{ url_for('home') }}#top" class="flex items-center gap-4 px-3 py-2.5 rounded-lg text-secondary hover:text-primary hover:bg-surface-hover transition-colors group">
+            <i class="ri-fire-line text-xl group-hover:text-accent transition-colors"></i>
+            <span class="font-medium">Trending</span>
+          </a>
+          
+          {% if profile.user_role == 'artist' %}
+          <a href="{{ url_for('artist_studio_view') }}" class="flex items-center gap-4 px-3 py-2.5 rounded-lg text-secondary hover:text-primary hover:bg-surface-hover transition-colors group">
+            <i class="ri-mic-2-line text-xl group-hover:text-accent transition-colors"></i>
+            <span class="font-medium">Artist Studio</span>
+          </a>
+          {% endif %}
+          <a href="{{ url_for('followed_artists_view') }}" class="flex items-center gap-4 px-3 py-2.5 rounded-lg text-secondary hover:text-primary hover:bg-surface-hover transition-colors group">
+            <i class="ri-user-star-line text-xl group-hover:text-accent transition-colors"></i>
+            <span class="font-medium">Artists</span>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <div class="text-xs font-semibold text-muted tracking-wider uppercase mb-4 px-2">Library</div>
+        <div class="space-y-1">
+          <a href="{{ url_for('collection_view', kind='likes') }}" class="flex items-center gap-4 px-3 py-2.5 rounded-lg text-secondary hover:text-primary hover:bg-surface-hover transition-colors group">
+            <i class="ri-heart-3-line text-xl group-hover:text-accent transition-colors"></i>
+            <span class="font-medium">Favourites</span>
+          </a>
+          {% if profile.user_role != 'artist' %}
+          <a href="{{ url_for('collection_view', kind='sales') }}" class="flex items-center gap-4 px-3 py-2.5 rounded-lg text-secondary hover:text-primary hover:bg-surface-hover transition-colors group">
+            <i class="ri-shopping-bag-3-line text-xl group-hover:text-accent transition-colors"></i>
+            <span class="font-medium">Bought Songs</span>
+          </a>
+          {% endif %}
+          {% if profile.subscription_type and profile.subscription_type != 'free' %}
+          <a href="{{ url_for('collection_view', kind='downloads') }}" class="flex items-center gap-4 px-3 py-2.5 rounded-lg text-secondary hover:text-primary hover:bg-surface-hover transition-colors group">
+            <i class="ri-download-cloud-2-line text-xl group-hover:text-accent transition-colors"></i>
+            <span class="font-medium">Downloads</span>
+          </a>
+          {% endif %}
+          {% if profile.user_role != 'artist' %}
+          <a href="{{ url_for('playlists_view') }}" class="flex items-center gap-4 px-3 py-2.5 rounded-lg text-secondary hover:text-primary hover:bg-surface-hover transition-colors group">
+            <i class="ri-play-list-fill text-xl group-hover:text-accent transition-colors"></i>
+            <span class="font-medium">Playlists</span>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+
+    </nav>
+
+    <!-- User Profile Snippet in Sidebar -->
+    <div class="p-4 border-t border-border mt-auto shrink-0 flex items-center justify-between gap-1">
+      <a href="{{ url_for('profile_view') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-hover transition-colors flex-1 min-w-0">
+        <div class="w-10 h-10 rounded-full bg-surface-active flex items-center justify-center text-primary font-medium shrink-0">
+          {{ profile.name[:1] if profile.name else '?' }}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-medium text-primary truncate">{{ profile.name }}</div>
+          <div class="text-xs text-secondary truncate">{{ profile.subscription_type or 'free' }} • {{ profile.user_role }}</div>
+        </div>
+      </a>
+      <a href="{{ url_for('logout') }}" hx-boost="false" class="w-9 h-9 rounded-lg flex items-center justify-center text-secondary hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0" title="Log Out">
+        <i class="ri-logout-box-r-line text-lg"></i>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Area & Player -->
+  <div class="flex-1 flex flex-col min-w-0 relative">
+    
+    <!-- Header with Search -->
+    <header class="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/80 to-transparent z-10 pointer-events-none">
+      <div class="max-w-[1400px] mx-auto px-8 h-full flex items-center justify-center pointer-events-auto">
+        <div class="relative w-[500px] max-w-full">
+          <i class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-muted"></i>
+          <input id="search-input" type="search" placeholder="Search songs, artists, playlists..." class="w-full bg-[#121212] border border-border rounded-full pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:border-accent text-primary placeholder-muted transition-all" />
+          <div id="search-dropdown" class="absolute top-full left-0 right-0 mt-2 bg-[#121212] border border-border rounded-xl shadow-2xl hidden max-h-[400px] overflow-y-auto z-50"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Scrollable Content -->
+    <main class="flex-1 overflow-y-auto pt-20" id="main-content">
+      <div class="max-w-[1400px] mx-auto px-8 pb-32 pt-8">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+
+    <!-- Player Bar -->
+    <footer class="player-bar-container absolute bottom-0 left-0 right-0 h-[90px] px-6 flex items-center justify-between z-40 shrink-0">
+      <!-- Now Playing -->
+      <div class="flex items-center gap-4 w-[30%] min-w-[200px]">
+        <div class="tiny-cover w-14 h-14 rounded-md bg-surface-active shadow-md overflow-hidden shrink-0 bg-cover-center"></div>
+        <div class="min-w-0 flex-1">
+          <a id="np-title" href="#" class="font-medium text-primary truncate hover:underline cursor-pointer block">Nothing playing</a>
+          <div id="np-artist" class="text-xs text-secondary truncate mt-0.5">Tap Play on any song tile</div>
+        </div>
+        <button id="np-like" class="w-8 h-8 rounded-full flex items-center justify-center text-secondary hover:text-accent hover:bg-surface transition-colors shrink-0">
+            <i class="ri-heart-line text-xl" id="np-like-icon"></i>
+        </button>
+      </div>
+
+      <!-- Controls -->
+      <div class="flex flex-col items-center max-w-[45%] w-full gap-2">
+        <div class="flex items-center gap-6">
+          <button id="shuffle-btn" class="text-secondary hover:text-primary transition-colors"><i class="ri-shuffle-line text-lg"></i></button>
+          <button id="prev-track" class="text-secondary hover:text-primary transition-colors"><i class="ri-skip-back-fill text-2xl"></i></button>
+          <button id="toggle-play" class="w-10 h-10 rounded-full bg-primary hover:scale-105 transition-transform flex items-center justify-center text-black shadow-lg">
+            <i class="ri-play-fill text-2xl ml-0.5" id="play-icon"></i>
+          </button>
+          <button id="next-track" class="text-secondary hover:text-primary transition-colors"><i class="ri-skip-forward-fill text-2xl"></i></button>
+        </div>
+        <div class="flex items-center gap-3 w-full max-w-md">
+          <span id="elapsed" class="text-xs text-secondary w-10 text-right tabular-nums">0:00</span>
+          <div class="flex-1 flex items-center relative group">
+            <input id="progress" type="range" min="0" max="100" value="0" class="absolute inset-0 w-full z-10" />
+            <div class="h-1 w-full bg-border rounded-full overflow-hidden pointer-events-none">
+              <div id="progress-fill" class="h-full bg-accent w-0 group-hover:bg-accent-hover transition-colors"></div>
+            </div>
+          </div>
+          <span id="duration" class="text-xs text-secondary w-10 tabular-nums">0:00</span>
+        </div>
+      </div>
+
+      <!-- Extra Actions (Volume, Menus) -->
+      <div class="flex items-center justify-end gap-2 w-[30%] min-w-[200px]">
+        <button id="player-add-playlist" class="w-9 h-9 rounded-full flex items-center justify-center text-secondary hover:text-primary hover:bg-surface transition-colors focus:outline-none" title="Add to Playlist">
+          <i class="ri-play-list-add-line text-xl"></i>
+        </button>
+        <button id="player-download" class="w-9 h-9 rounded-full flex items-center justify-center text-secondary hover:text-primary hover:bg-surface transition-colors focus:outline-none" title="Download / Buy">
+          <i class="ri-download-2-line text-xl" id="player-download-icon"></i>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <div id="song-stats-popover" class="fixed hidden bg-surface border border-border shadow-2xl rounded-xl p-4 z-50 min-w-[250px]">
+    <button id="close-stats" class="absolute top-2 right-2 text-muted hover:text-primary"><i class="ri-close-line text-lg"></i></button>
+    <div id="stats-content"></div>
+  </div>
+
+  <dialog id="playlist-dialog" class="bg-surface border border-border rounded-xl shadow-2xl p-6 text-primary backdrop:bg-black/50 w-[400px] max-w-[90vw]">
+    <h3 class="text-lg font-bold mb-4">Create Playlist</h3>
+    <input id="modal-playlist-name" type="text" placeholder="Playlist Name" class="w-full bg-[#121212] border border-border rounded-md px-3 py-2 text-sm mb-6 focus:outline-none focus:border-accent" maxlength="80" />
+    <div class="flex justify-end gap-3">
+      <button id="cancel-playlist-btn" class="px-4 py-2 text-sm font-medium text-secondary hover:text-primary transition-colors">Cancel</button>
+      <button id="save-playlist-btn" class="px-4 py-2 text-sm font-medium bg-accent hover:bg-accent-hover text-white rounded-md transition-colors">Create</button>
+    </div>
+  </dialog>
+
+  <script>
+    window.APP_CONFIG = window.APP_CONFIG || {};
+    Object.assign(window.APP_CONFIG, {
+      apiBaseUrl: "{{ api_base_url }}",
+      userId: "{{ user_id }}",
+      subscriptionType: "{{ profile.subscription_type or 'free' }}",
+      userRole: "{{ profile.user_role }}"
+    });
+  </script>
+  {% block extra_config %}{% endblock %}
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

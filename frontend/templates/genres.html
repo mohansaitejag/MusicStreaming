@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Genres | PulseBeat{% endblock %}
+
+{% block content %}
+<div class="mb-10">
+  <p class="text-sm font-semibold text-accent uppercase tracking-wider mb-2">Explore</p>
+  <h2 class="text-4xl font-bold text-primary tracking-tight mb-8">All Genres</h2>
+  
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+    {% for g in genres %}
+    <a href="{{ url_for('genre_view', genre_id=g.genre_id) }}" class="group block relative overflow-hidden rounded-2xl aspect-video hover:scale-[1.02] transition-transform">
+      <!-- Background pattern/color based on genre name hash or random -->
+      <div class="absolute inset-0 bg-surface-active bg-cover-center opacity-80 group-hover:opacity-100 transition-opacity artist-portrait" data-artist-name="{{ g.genre_name }} genre"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+      <div class="absolute bottom-4 left-4 right-4">
+        <h3 class="text-xl font-bold text-white tracking-wide truncate group-hover:text-accent transition-colors">{{ g.genre_name }}</h3>
+      </div>
+    </a>
+    {% else %}
+    <div class="col-span-full py-12 text-center text-muted border border-border border-dashed rounded-lg">No genres available</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

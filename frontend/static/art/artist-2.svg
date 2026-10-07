@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Artist portrait 2">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f3460"/>
+      <stop offset="100%" stop-color="#00d4c8"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" rx="44" fill="url(#g)"/>
+  <circle cx="200" cy="150" r="78" fill="rgba(255,255,255,0.2)"/>
+  <path d="M106 332c18-58 58-88 94-88s76 30 94 88" fill="rgba(255,255,255,0.15)"/>
+  <path d="M92 118c24-42 58-68 108-68s84 20 116 60" fill="rgba(255,255,255,0.1)"/>
+  <text x="34" y="350" fill="white" font-family="Arial, sans-serif" font-size="46" font-weight="700" opacity="0.9">A2</text>
+</svg>

@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}{{ song.song_title }} | PulseBeat{% endblock %}
+
+{% block content %}
+<div class="mb-12">
+  <div class="flex flex-col md:flex-row gap-8 items-end">
+    <!-- Album Art -->
+    <div class="w-64 h-64 md:w-72 md:h-72 shrink-0 rounded-2xl shadow-2xl bg-surface-active bg-cover-center song-cover-large group relative overflow-hidden" data-song='{{ song|tojson }}'>
+       <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+          <div class="w-20 h-20 rounded-full bg-accent text-white flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
+            <i class="ri-play-fill text-4xl ml-2"></i>
+          </div>
+       </div>
+    </div>
+    
+    <!-- Song Info -->
+    <div class="flex-1 min-w-0 pb-2">
+      <p class="text-sm font-semibold text-accent uppercase tracking-wider mb-2">Song</p>
+      <h1 class="text-5xl md:text-7xl font-bold text-primary tracking-tighter mb-4 truncate">{{ song.song_title }}</h1>
+      
+      <div class="flex items-center gap-2 text-lg text-secondary mb-6">
+        {% if song.artist_id %}
+        <a href="{{ url_for('artist_view', artist_id=song.artist_id) }}" class="flex items-center gap-2 group hover:text-primary transition-colors">
+          <div class="w-8 h-8 rounded-full bg-surface-active overflow-hidden shrink-0 bg-cover-center artist-portrait" data-artist-name="{{ song.artists }}" data-artist-id="{{ song.artist_id }}"></div>
+          <span class="font-medium text-primary group-hover:underline cursor-pointer">{{ song.artists or "Unknown Artist" }}</span>
+        </a>
+        {% else %}
+        <div class="w-8 h-8 rounded-full bg-surface-active overflow-hidden shrink-0 bg-cover-center artist-portrait" data-artist-name="{{ song.artists }}" data-artist-id="{{ song.artist_id or '' }}"></div>
+        <span class="font-medium text-primary">{{ song.artists or "Unknown Artist" }}</span>
+        {% endif %}
+        <span class="text-muted">•</span>
+        <span>{{ song.duration|default(0) }}s</span>
+        <span class="text-muted">•</span>
+        <span>{{ song.num_plays|default(0) }} plays</span>
+      </div>
+      
+      <div class="flex flex-wrap items-center gap-4">
+        <button class="play-btn w-14 h-14 rounded-full bg-accent hover:scale-105 transition-transform flex items-center justify-center text-white shadow-lg shadow-accent/30 shrink-0" data-song='{{ song|tojson }}'>
+          <i class="ri-play-fill text-3xl ml-1"></i>
+        </button>
+        
+        {% if is_publisher %}
+        <a class="px-6 py-3 rounded-full bg-surface hover:bg-surface-active border border-border text-primary font-medium transition-colors" href="{{ url_for('artist_studio_view', edit_song_id=song.song_id) }}">
+          Edit Song
+        </a>
+        <button class="delete-song-btn px-6 py-3 rounded-full bg-surface hover:bg-red-500/20 border border-red-500/40 hover:border-red-500 text-red-400 font-medium transition-colors" data-song-id="{{ song.song_id }}" data-song-title="{{ song.song_title }}" data-redirect="/artist-studio">
+          <i class="ri-delete-bin-line mr-2"></i>Delete Song
+        </button>
+        {% endif %}
+        
+        {% if profile.user_role != 'artist' %}
+        <button class="like-btn w-12 h-12 rounded-full border border-border hover:border-accent hover:text-accent flex items-center justify-center transition-colors shrink-0" data-song='{{ song|tojson }}' title="Like">
+          <i class="ri-heart-line text-xl"></i>
+        </button>
+        
+        <button class="add-playlist-btn px-6 py-3 rounded-full border border-border hover:bg-surface-active font-medium transition-colors" data-song='{{ song|tojson }}'>
+          Add to Playlist
+        </button>
+        
+        {% if profile.subscription_type and profile.subscription_type != 'free' %}
+        <button class="download-btn px-6 py-3 rounded-full bg-surface hover:bg-surface-active border border-border font-medium transition-colors" data-song='{{ song|tojson }}'>
+          <i class="ri-download-line mr-2"></i>Download
+        </button>
+        {% else %}
+        <button class="sale-btn px-6 py-3 rounded-full bg-surface hover:bg-surface-active border border-border text-accent font-medium transition-colors" data-song='{{ song|tojson }}'>
+          <i class="ri-shopping-cart-2-line mr-2"></i>Buy Song
+        </button>
+        {% endif %}
+        {% endif %}
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <div class="lg:col-span-2">
+    <section id="related" class="mb-12">
+      <div class="flex items-end justify-between mb-6">
+        <div>
+          <h3 class="text-2xl font-bold">More Songs For You</h3>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2" id="related-songs">
+        <!-- Related songs will be loaded here -->
+        <div class="py-6 text-center text-muted border border-border border-dashed rounded-lg" id="related-loading">Loading recommendations...</div>
+      </div>
+    </section>
+  </div>
+  
+  <div>
+    <!-- Side pane for stats or info -->
+    <div class="bg-surface border border-border rounded-2xl p-6">
+       <h4 class="font-bold text-lg mb-4">Song Info</h4>
+       <div class="space-y-3">
+         <div class="flex justify-between">
+           <span class="text-secondary text-sm">Genres</span>
+           <span class="text-primary text-sm font-medium">{{ song.genres or "Unknown" }}</span>
+         </div>
+         <div class="flex justify-between">
+           <span class="text-secondary text-sm">Likes</span>
+           <span class="text-primary text-sm font-medium">{{ song.num_likes|default(0) }}</span>
+         </div>
+         <div class="flex justify-between">
+           <span class="text-secondary text-sm">Sales</span>
+           <span class="text-primary text-sm font-medium">{{ song.num_downloads|default(0) }}</span>
+         </div>
+       </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.APP_CONFIG = window.APP_CONFIG || {};
+  window.APP_CONFIG.songId = {{ song.song_id }};
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const relatedGrid = document.getElementById('related-songs');
+    const loading = document.getElementById('related-loading');
+    if (!relatedGrid || !window.APP_CONFIG.userId) return;
+
+    try {
+      const res = await fetch(`${window.APP_CONFIG.apiBaseUrl}/api/recommendations/${window.APP_CONFIG.userId}`);
+      if(res.ok) {
+        const recommendations = await res.json();
+        if (recommendations && recommendations.length > 0) {
+          const relatedSongs = recommendations.filter(s => s.song_id !== window.APP_CONFIG.songId).slice(0, 5);
+          
+          if(relatedSongs.length > 0) {
+            if(loading) loading.remove();
+            
+            relatedGrid.innerHTML = relatedSongs.map(s => `
+              <article class="flex items-center justify-between p-3 rounded-lg hover:bg-surface-hover transition-colors group cursor-pointer song-clickable" data-song='${JSON.stringify(s).replace(/'/g, "&apos;")}'>
+                <div class="flex items-center gap-4 min-w-0">
+                  <div class="w-12 h-12 rounded bg-surface-active shrink-0 relative overflow-hidden bg-cover-center row-cover">
+                     <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <i class="ri-play-fill text-white"></i>
+                     </div>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="font-medium text-primary truncate">${s.song_title}</div>
+                    <div class="text-xs text-secondary truncate">${s.artists || 'Unknown Artist'}</div>
+                  </div>
+                </div>
+              </article>
+            `).join('');
+            
+            if(window.refreshSongArtwork) window.refreshSongArtwork(relatedGrid);
+          } else {
+             if(loading) loading.textContent = 'No recommendations found.';
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load related songs:', error);
+      if(loading) loading.textContent = 'Failed to load.';
+    }
+  });
+</script>
+{% endblock %}

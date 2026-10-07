@@ -1,0 +1,18 @@
+{
+  "artist_id_to_filename": {
+    "1": "1.jpg",
+    "2": "2.jpg",
+    "3": "3.jpg",
+    "4": "4.jpg",
+    "5": "5.jpg",
+    "6": "6.jpeg"
+  },
+  "artist_name_to_filename": {
+    "arijit singh": "1.jpg",
+    "taylor swift": "2.jpg",
+    "ap dhillon": "3.jpg",
+    "indie band x": "4.jpg",
+    "coldplay": "5.jpg",
+    "artist one": "6.jpeg"
+  }
+}

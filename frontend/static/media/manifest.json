@@ -1,0 +1,36 @@
+{
+  "songCovers": [
+    "/static/media/song-covers/song -1.jfif",
+    "/static/media/song-covers/song -2.jpg",
+    "/static/media/song-covers/song -3.jpg",
+    "/static/media/song-covers/song -4.jfif",
+    "/static/media/song-covers/song -5.jfif",
+    "/static/media/song-covers/song -6.jpg",
+    "/static/media/song-covers/song -7.jpg",
+    "/static/media/song-covers/song -8.jfif",
+    "/static/media/song-covers/song -9.jpeg",
+    "/static/media/song-covers/song -10.jpeg",
+    "/static/media/song-covers/song -11.jfif",
+    "/static/media/song-covers/song -12.jpeg",
+    "/static/media/song-covers/song -13.jfif",
+    "/static/media/song-covers/song -14.jfif",
+    "/static/media/song-covers/song -15.jfif",
+    "/static/media/song-covers/song -16.jpeg",
+    "/static/media/song-covers/song -17.jpg",
+    "/static/media/song-covers/song -18.jpg",
+    "/static/media/song-covers/song -19.jpg",
+    "/static/media/song-covers/song -20.jfif",
+    "/static/media/song-covers/song -21.jpg"
+  ],
+  "artistPhotos": [
+    "/static/media/artist-photos/1.jpg",
+    "/static/media/artist-photos/2.jpg",
+    "/static/media/artist-photos/3.jpg",
+    "/static/media/artist-photos/4.jfif",
+    "/static/media/artist-photos/5.jpg",
+    "/static/media/artist-photos/6.jpeg"
+  ],
+  "testAudios": [
+    "/static/media/audio/test.mp3"
+  ]
+}

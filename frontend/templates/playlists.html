@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Playlists | PulseBeat{% endblock %}
+
+{% block content %}
+<div class="mb-10 flex items-center justify-between">
+  <div>
+    <p class="text-sm font-semibold text-accent uppercase tracking-wider mb-2">Your Library</p>
+    <h2 class="text-4xl font-bold text-primary tracking-tight">Your Playlists</h2>
+  </div>
+  <button class="flex items-center gap-2 px-4 py-2 bg-surface hover:bg-surface-hover border border-border rounded-lg text-primary transition-colors" onclick="document.getElementById('playlist-dialog').showModal()">
+    <i class="ri-add-line text-lg"></i>
+    <span class="font-medium">New Playlist</span>
+  </button>
+</div>
+
+<section id="playlists">
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+    {% for p in playlists %}
+    <a class="bg-surface hover:bg-surface-hover rounded-xl p-4 transition-all group block tile-card" data-playlist-id="{{ p.playlist_id }}" href="{{ url_for('playlist_view', playlist_id=p.playlist_id) }}">
+      <div class="w-full aspect-square rounded-lg bg-surface-active mb-4 overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow relative">
+        {% if p.top_songs and p.top_songs|length >= 4 %}
+        <div class="grid grid-cols-2 h-full w-full">
+            {% for i in range(4) %}
+            <div class="bg-surface-active bg-cover-center opacity-80" style="background-image: url('https://picsum.photos/seed/{{ p.top_songs[i].song_title|urlencode }}/200/200')"></div>
+            {% endfor %}
+        </div>
+        {% elif p.top_songs and p.top_songs|length > 0 %}
+        <div class="w-full h-full bg-cover-center" style="background-image: url('https://picsum.photos/seed/{{ p.top_songs[0].song_title|urlencode }}/400/400')"></div>
+        {% else %}
+        <div class="w-full h-full bg-gradient-to-br from-accent/20 to-surface-active flex items-center justify-center">
+            <i class="ri-play-list-line text-4xl text-muted"></i>
+        </div>
+        {% endif %}
+      </div>
+      <div class="font-semibold text-primary truncate">{{ p.playlist_name }}</div>
+      <div class="text-xs text-secondary truncate mt-1">{{ p.song_count }} songs</div>
+    </a>
+    {% else %}
+    <div class="col-span-full py-12 text-center text-muted border border-border border-dashed rounded-xl">
+      <div class="text-4xl mb-4"><i class="ri-play-list-add-line"></i></div>
+      <p>You haven't created any playlists yet.</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
